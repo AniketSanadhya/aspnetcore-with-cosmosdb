@@ -1,10 +1,13 @@
+using DemoCarApp.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.SpaServices.AngularCli;
+using Microsoft.Azure.Cosmos;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using System.Threading.Tasks;
 
 namespace DemoCarApp
 {
@@ -26,6 +29,7 @@ namespace DemoCarApp
             {
                 configuration.RootPath = "ClientApp/dist";
             });
+            services.AddSingleton<ICarsService>(InitializeCosmosClientInstanceAsync(Configuration.GetSection("CosmosDb")).GetAwaiter().GetResult());
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -71,5 +75,19 @@ namespace DemoCarApp
                 }
             });
         }
+
+        private static async Task<CarsService> InitializeCosmosClientInstanceAsync(IConfigurationSection configurationSection)
+        {
+            string databaseName = configurationSection.GetSection("DatabaseName").Value;
+            string containerName = configurationSection.GetSection("ContainerName").Value;
+            string account = configurationSection.GetSection("Account").Value;
+            string key = configurationSection.GetSection("Key").Value;
+            CosmosClient client = new CosmosClient(account, key);
+            CarsService carsService = new CarsService(client, databaseName, containerName);
+            DatabaseResponse database = await client.CreateDatabaseIfNotExistsAsync(databaseName);
+            await database.Database.CreateContainerIfNotExistsAsync(containerName, "/make");
+            return carsService;
+        }
+
     }
 }
