@@ -34,7 +34,7 @@ namespace DemoCarApp.Controllers
         [HttpPut("{id}")]
         public async Task Update(Guid id, Cars car)
         {
-            await carsService.Update(id,car.Make);
+            await carsService.Update(id,car);
         }
 
         [HttpDelete("{id}/{make}")]

@@ -35,7 +35,7 @@ namespace DemoCarApp
                 options.AddPolicy(name: "Dev",
                                   builder =>
                                   {
-                                      builder.WithOrigins("http://localhost:4200")
+                                      builder.WithOrigins("http://localhost:4200,https://localhost:5001")
                                             .AllowAnyMethod()
                                             .AllowAnyHeader()
                                             .AllowCredentials();
