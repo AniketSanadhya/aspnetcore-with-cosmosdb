@@ -59,15 +59,15 @@ namespace DemoCarApp.Services
             }
         }
 
-        public async Task Update(Guid id, string make)
+        public async Task Update(Guid id, Cars car)
         {
             try
             {
 
-                var data = await GetCarById(id, make);
+                var data = await GetCarById(id, car.Make);
                 if (data != null)
                 {
-                    await container.UpsertItemAsync<Cars>(data, new PartitionKey(make));
+                    await container.UpsertItemAsync<Cars>(car, new PartitionKey(car.Make));
                 }
             }
             catch (Exception ex)
