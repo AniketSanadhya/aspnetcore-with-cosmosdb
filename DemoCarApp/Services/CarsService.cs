@@ -17,12 +17,13 @@ namespace DemoCarApp.Services
 
         public async Task Add(Cars car)
         {
-            await container.CreateItemAsync(car, new PartitionKey(car.Id.ToString()));
+            car.Id = Guid.NewGuid();
+            await container.CreateItemAsync(car, new PartitionKey(car.Make));
         }
 
-        public async Task Delete(Guid id)
+        public async Task Delete(Guid id, string make)
         {
-            await container.DeleteItemAsync<Cars>(id.ToString(), new PartitionKey(id.ToString()));
+            await container.DeleteItemAsync<Cars>(id.ToString(), new PartitionKey(make));
         }
 
         public async Task<List<Cars>> GetCars()
@@ -31,7 +32,7 @@ namespace DemoCarApp.Services
             {
                 var response = container.GetItemQueryIterator<Cars>(new QueryDefinition("SELECT * FROM Cars"));
                 List<Cars> cars = new List<Cars>();
-                while(response.HasMoreResults)
+                while (response.HasMoreResults)
                 {
                     var data = await response.ReadNextAsync();
                     cars.AddRange(data.ToList());
@@ -44,29 +45,29 @@ namespace DemoCarApp.Services
             }
         }
 
-        public async Task<Cars> GetCarById(Guid id)
+        public async Task<Cars> GetCarById(Guid id, string make)
         {
             try
             {
-                var response = await container.ReadItemAsync<Cars>(id.ToString(), new PartitionKey(id.ToString()));
+                var response = await container.ReadItemAsync<Cars>(id.ToString(), new PartitionKey(make));
                 return response.Resource;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
 
                 return null;
             }
         }
 
-        public async Task Update(Guid id)
+        public async Task Update(Guid id, string make)
         {
             try
             {
 
-                var data = await GetCarById(id);
+                var data = await GetCarById(id, make);
                 if (data != null)
                 {
-                    await container.UpsertItemAsync<Cars>(data, new PartitionKey(id.ToString()));
+                    await container.UpsertItemAsync<Cars>(data, new PartitionKey(make));
                 }
             }
             catch (Exception ex)

@@ -31,23 +31,22 @@ namespace DemoCarApp.Controllers
              await carsService.Add(car);
         }
 
-        [HttpPut]
-        public async Task Update(Guid id)
+        [HttpPut("{id}")]
+        public async Task Update(Guid id, Cars car)
         {
-            await carsService.Update(id);
+            await carsService.Update(id,car.Make);
         }
 
-        [HttpDelete]
-        public async Task Delete(Guid id)
+        [HttpDelete("{id}/{make}")]
+        public async Task Delete(Guid id, string make)
         {
-            await carsService.Delete(id);
+            await carsService.Delete(id,make);
         }
 
-        [HttpGet]
-        [Route("GetById/{id}")]
-        public async Task<Cars> GetById(Guid id)
+        [HttpGet("{id}/{make}")]
+        public async Task<Cars> Get(Guid id, string make)
         {
-            return await carsService.GetCarById(id);
+            return await carsService.GetCarById(id,make);
         }
     }
 }
